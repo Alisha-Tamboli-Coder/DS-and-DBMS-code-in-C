@@ -1,0 +1,465 @@
+Assignment 5 - Set A
+
+a) Perform the following operations using static implementation of stack
+i. Accept n integers from user and push it into the stack.
+ii. Pop the element from the stack and display it (Use isEmpty()
+
+#include <stdio.h>
+#define MAX 100
+
+int stack[MAX];
+int top = -1;
+
+void push(int x) {
+    if (top == MAX - 1) {
+        printf("Stack Overflow\n");
+    } else {
+        top++;
+        stack[top] = x;
+    }
+}
+
+int pop() {
+    if (top == -1) {
+        printf("Stack Underflow\n");
+        return -1;
+    } else {
+        return stack[top--];
+    }
+}
+
+int main() {
+    int n, x, i;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    printf("Enter %d integers:\n", n);
+    for (i = 0; i < n; i++) {
+        scanf("%d", &x);
+        push(x);
+    }
+
+    printf("Popping elements:\n");
+    while (top != -1) {
+        printf("%d ", pop());
+    }
+
+    return 0;
+}
+
+
+b) Perform the following operations using dynamic implementation of stack
+i. Accept n integers from user and push it into the stack.
+ii. Pop the element from the stack and display it.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+struct Node* top = NULL;
+
+void push(int x) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = x;
+    newNode->next = top;
+    top = newNode;
+}
+
+int pop() {
+    if (top == NULL) {
+        printf("Stack Underflow\n");
+        return -1;
+    } else {
+        int val = top->data;
+        struct Node* temp = top;
+        top = top->next;
+        free(temp);
+        return val;
+    }
+}
+
+int main() {
+    int n, x, i;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    printf("Enter %d integers:\n", n);
+    for (i = 0; i < n; i++) {
+        scanf("%d", &x);
+        push(x);
+    }
+
+    printf("Popping elements:\n");
+    while (top != NULL) {
+        printf("%d ", pop());
+    }
+    return 0;              
+}
+
+a) Perform the following operations using implementation of stack (Static or dynamic)
+i. Accept n integers from user and push it into the stack.
+ii. Reverses a string of characters using stack and check weather given string is palindrome or not.
+#include <stdio.h>
+#include <string.h>
+#define MAX 100
+
+char stack[MAX];
+int top = -1;
+
+void push(char c) {
+    if (top == MAX - 1) {
+        printf("Stack Overflow\n");
+    } else {
+        stack[++top] = c;
+    }
+}
+
+char pop() {
+    if (top == -1) {
+        printf("Stack Underflow\n");
+        return '\0';
+    } else {
+        return stack[top--];
+    }
+}
+
+int main()    {
+    int n, i, x;
+    char str[100], rev[100];
+
+    // Clear stack for string part
+    top = -1;
+
+    printf("\nEnter a string: ");
+    scanf("%s", str);
+
+    for (i = 0; str[i] != '\0'; i++) {
+        push(str[i]);
+    }
+    for (i = 0; str[i] != '\0'; i++) {
+        rev[i] = pop();
+    }
+    rev[i] = '\0';
+    printf("Reversed string: %s\n", rev);
+
+    // Part 3: Palindrome check
+    if (strcmp(str, rev) == 0)
+        printf("String is Palindrome\n");
+    else
+        printf("String is Not Palindrome\n");
+
+    return 0;
+}
+
+b) Write a menu driven program to perform the following operations on stack
+i. Convert an infix expression of the form (a*(b-c*d)/((a+d)/b)) into its equivalent
+postfix notation.
+ii. Evaluation of postfix expression
+Evaluate a Postfix Expression
+•	Once you have a postfix expression, you should be able to evaluate it using a stack.
+•	Example:
+•	Postfix: 23*4+
+•	Step: (2*3) + 4 = 10
+•	Result = 10
+•	Note: Evaluation generally works with digits/numbers, not variables (a, b, c).
+Menu:
+1. Infix to Postfix
+2. Evaluate Postfix
+3. Exit
+Enter choice:
+
+But the second part (evaluation of postfix) needs actual numbers to calculate a result.
+•	If we use a, b, c, we don’t know their values.
+•	So usually, for evaluation, we give an example with numbers (like 2 3 * 4 +).
+•	That’s why I took 23*4+ → easier to show calculation → (2*3)+4=10.
+So:
+•	Infix to Postfix → alphabets (a*(b-c)).
+•	Evaluation of Postfix → numbers (23*4+).
+
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
+#define MAX 100
+
+// Stack for characters
+char stack[MAX];
+int top = -1;
+
+int evalStack[MAX];
+int evalTop = -1;
+
+void push(char c) {
+    stack[++top] = c;
+}
+char pop() {
+    return stack[top--];
+}
+char peek() {
+    return stack[top];
+}
+int isEmpty() {
+    return top == -1;
+}
+
+void pushEval(int n) {
+    evalStack[++evalTop] = n;
+}
+int popEval() {
+    return evalStack[evalTop--];
+}
+
+int precedence(char c) {
+    if (c == '^')
+        return 3;
+    else if (c == '*' || c == '/')
+        return 2;
+    else if (c == '+' || c == '-')
+        return 1;
+    else
+        return -1;
+}
+void infixToPostfix(char infix[], char postfix[]) {
+    int i, j = 0;
+    char c;
+    for (i = 0; i < strlen(infix); i++) {
+        c = infix[i];
+
+        if (isalnum(c)) {
+            postfix[j++] = c;
+        }
+        else if (c == '(') {
+            push(c);
+        }
+        else if (c == ')') {
+            while (!isEmpty() && peek() != '(') {
+                postfix[j++] = pop();
+            }
+            pop(); // remove '('
+        }
+        else {
+            while (!isEmpty() && precedence(peek()) >= precedence(c)) {
+                postfix[j++] = pop();
+            }
+            push(c);
+        }
+    }
+    while (!isEmpty()) {
+        postfix[j++] = pop();
+    }
+    postfix[j] = '\0';
+}
+
+// --- Postfix Evaluation ---
+int evaluatePostfix(char postfix[]) {
+    int i, val;
+    char c;
+
+    for (i = 0; i < strlen(postfix); i++) {
+        c = postfix[i];
+
+        if (isalnum(c)) {
+            // Assign value: a=1, b=2, c=3, d=4 (just for demo)
+            val = c - 'a' + 1;
+            pushEval(val);
+        }
+        else {
+            int val2 = popEval();
+            int val1 = popEval();
+            switch (c) {
+                case '+': pushEval(val1 + val2); break;
+                case '-': pushEval(val1 - val2); break;
+                case '*': pushEval(val1 * val2); break;
+                case '/': pushEval(val1 / val2); break;
+            }
+        }
+    }
+    return popEval();
+}
+int main() {
+    int choice;
+    char infix[MAX] = "(a*(b-c*d)/((a+d)/b))";  // hardcoded
+    char postfix[MAX];
+
+    while (1) {
+        printf("1. Convert Infix to Postfix\n");
+        printf("2. Evaluate Postfix Expression\n");
+        printf("3. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+        case 1:
+            top = -1;
+            infixToPostfix(infix, postfix);
+            printf("\nInfix Expression   : %s\n", infix);
+            printf("Postfix Expression : %s\n", postfix);
+            break;
+
+        case 2:
+            evalTop = -1;
+            top = -1;
+            infixToPostfix(infix, postfix);
+            printf("\nEvaluating Postfix : %s\n", postfix);
+            printf("Evaluation Result  = %d\n", evaluatePostfix(postfix));
+            break;
+
+        case 3:
+            exit(0);
+
+        default:
+            printf("Invalid Choice! .\n");
+        }
+    }
+    return 0;
+}
+
+
+
+Assignment 5 
+Set A
+1.  Create the following relations, for an investment firm
+emp(emp_id ,emp_name, address, bdate)
+Investor (inv_no, inv_name, inv_date, inv_amt)
+An employee may invest in one or more investments; hence he can be an investor. But an investor
+need not be an employee of the firm.
+Create the Relations accordingly, so that the relationship is handled properly and the relations are
+in normalized form (3NF).
+Assume appropriate data types for the attributes. Add any new attributes, as required by the
+queries. Insert sufficient number of records in the relations / tables with appropriate values as
+suggested by some of the queries.
+Write the following queries & execute them.
+1. List the distinct names of customers who are either employees, or investors or both.
+2. List the names of customers who are either employees, or investors or both.
+3. List the names of employees who are also investors.
+4. List the names of employees who are not investors
+
+
+CREATE TABLE Emp (
+    emp_id SERIAL PRIMARY KEY,
+    emp_name VARCHAR(50),
+    address VARCHAR(100),
+    bdate DATE
+);
+
+
+CREATE TABLE Investor (
+    inv_no SERIAL PRIMARY KEY,
+    inv_name VARCHAR(50),
+    inv_date DATE,
+    inv_amt NUMERIC
+);
+
+INSERT INTO Emp (emp_name, address, bdate) VALUES
+('Alice', 'Pune', '1990-01-01'),
+('Bob', 'Mumbai', '1988-03-15'),
+('Charlie', 'Delhi', '1992-07-10');
+
+INSERT INTO Investor (inv_name, inv_date, inv_amt) VALUES
+('Alice', '2024-01-01', 50000),
+('Bob', '2024-02-01', 75000),
+('Eve', '2024-03-01', 60000);
+
+-- 1. Distinct names of customers (employees, investors, or both)
+SELECT DISTINCT emp_name AS customer FROM Emp
+UNION
+SELECT DISTINCT inv_name FROM Investor;
+
+-- 2. Names of customers (employees, investors, or both, duplicates allowed)
+SELECT emp_name AS customer FROM Emp
+UNION ALL
+SELECT inv_name FROM Investor;
+
+-- 3. Employees who are also investors
+SELECT emp_name FROM Emp
+WHERE emp_name IN (SELECT inv_name FROM Investor);
+
+-- 4. Employees who are not investors
+SELECT emp_name FROM Emp
+WHERE emp_name NOT IN (SELECT inv_name FROM Investor);
+
+
+Set B
+Employee (emp_no, emp_name, address, city, birth_date, designation,salary)
+Project (project_no, project_name, status)
+Department (Dept_no, dept_name, location)
+Constraints: Employee designation is either ‘manager’, ‘staff’, ‘worker’.
+There exists a one-to-many relationship between Department and Employee. Many employees
+can work on many projects controlled by a department. Create the relations accordingly, so that
+the relationship is handled properly and the relations are in normalized form (3NF) and insert 5
+records into each table.
+Solve the following queries:
+1. Find the details of employee who is having highest salary.
+2. Delete all employees of department 20.
+3. List the names and salary of employees sorted by their salary.
+
+ANSWER--------------
+CREATE TABLE Department (
+    dept_no INT PRIMARY KEY,
+    dept_name VARCHAR(50),
+    location VARCHAR(50)
+);
+
+CREATE TABLE Employee (
+    emp_no SERIAL PRIMARY KEY,
+    emp_name VARCHAR(50),
+    address VARCHAR(100),
+    city VARCHAR(50),
+    birth_date DATE,
+    designation VARCHAR(20) CHECK (designation IN ('manager','staff','worker')),
+    salary NUMERIC,
+    dept_no INT REFERENCES Department(dept_no)
+);
+
+CREATE TABLE Project (
+    project_no SERIAL PRIMARY KEY,
+    project_name VARCHAR(50),
+    status VARCHAR(20),
+    dept_no INT REFERENCES Department(dept_no)
+);
+
+CREATE TABLE Works_On (
+    emp_no INT REFERENCES Employee(emp_no),
+    project_no INT REFERENCES Project(project_no),
+    PRIMARY KEY(emp_no, project_no)
+);
+
+INSERT INTO Department VALUES
+(10, 'HR', 'Pune'),
+(20, 'IT', 'Mumbai'),
+(30, 'Finance', 'Delhi');
+
+INSERT INTO Employee (emp_name,address,city,birth_date,designation,salary,dept_no) VALUES
+('Ravi','Street 1','Pune','1990-01-01','manager',90000,10),
+('Sneha','Street 2','Mumbai','1992-03-05','staff',50000,20),
+('Amit','Street 3','Delhi','1995-07-15','worker',30000,20);
+
+
+INSERT INTO Project (project_name,status,dept_no) VALUES
+('Payroll System','Active',30),
+('Website','Active',20),
+('Recruitment','Completed',10);
+
+-- Assign Employees to Projects
+INSERT INTO Works_On VALUES
+(1,1),(2,1),(3,1),
+(1,2),(2,2),(3,2),
+(1,3),(2,3),(3,3);
+
+
+-- 1. Find details of employee having highest salary
+SELECT * FROM Employee
+WHERE salary = (SELECT MAX(salary) FROM Employee);
+
+-- 2. List names and salary of employees sorted by salary
+SELECT emp_name, salary FROM Employee ORDER BY salary;
+
+-- 3. Delete all employees of department 20
+ DELETE FROM Employee WHERE dept_no = 20;
+
