@@ -1,0 +1,2 @@
+c) Write a program that adds two single variable polynomials. Each polynomial should be
+represented as a list with linked list implementation.
