@@ -1,1 +1,70 @@
+Set B
+Consider the following database maintained by a school to record the details of all the
+competitions organized by the school every year. The school maintains information about
+competitions. Competition type can be like ‘academics’ or ‘sports’ etc.
+Following are the tables:
+Competition (C_no int, Name char (20), Type char (15), No_of_participants int, cdate date, budget
+float)
+1. List out all the competitions held in the school.
+52
+2. List the names of all the competitions held in 2024.
+3. Give the name of a competitions of type ‘Academic’.
+4. Find out the total number of competitions organized in the school for competition type
+‘sports ‘.
+5. Find out maximum number of participants in competition.
+6. Display average budget of competition of Sports.
+7. Display competition name in which maximum number of participants are participated.
+8. Display name of competition with minimum budget.
+9. Display the total number of competition for each type.
+10. Display the total budget of competition for each type
+
+
+-- create
+CREATE TABLE Competition (
+    c_no INT PRIMARY KEY,
+    name VARCHAR(20),
+    type VARCHAR(15),
+    no_of_participants INT,
+    cdate DATE,
+    budget FLOAT
+);
+
+-- insert
+INSERT INTO Competition VALUES
+(1, 'Math Quiz', 'Academic', 50, '2024-01-15', 50000),
+(2, 'Science Fair', 'Academic', 100, '2023-12-10', 80000),
+(3, 'Football Match', 'Sports', 22, '2024-02-20', 150000);
+
+-- fetch 
+--- 1. List out all the competitions held in the school.
+SELECT * FROM Competition;
+
+-- 2. List the names of all the competitions held in 2024.
+SELECT name FROM Competition WHERE EXTRACT(YEAR FROM cdate) = 2024;
+
+-- 3. Give the name of a competitions of type ‘Academic’.
+SELECT name FROM Competition WHERE type = 'Academic';
+
+-- 4. Find out the total number of competitions organized in the school for competition type ‘Sports’.
+SELECT COUNT(*) AS total_sports FROM Competition WHERE type = 'Sports';
+
+-- 5. Find out maximum number of participants in competition.
+SELECT MAX(no_of_participants) AS max_participants FROM Competition;
+
+-- 6. Display average budget of competition of Sports.
+SELECT AVG(budget) AS avg_sports_budget FROM Competition WHERE type = 'Sports';
+
+-- 7. Display competition name in which maximum number of participants are participated.
+SELECT name FROM Competition 
+WHERE no_of_participants = (SELECT MAX(no_of_participants) FROM Competition);
+
+-- 8. Display name of competition with minimum budget.
+SELECT name FROM Competition 
+WHERE budget = (SELECT MIN(budget) FROM Competition);
+
+-- 9. Display the total number of competition for each type.
+SELECT type, COUNT(*) AS total_competitions FROM Competition GROUP BY type;
+
+-- 10. Display the total budget of competition for each type.
+SELECT type, SUM(budget) AS total_budget FROM Competition GROUP BY type;
 
