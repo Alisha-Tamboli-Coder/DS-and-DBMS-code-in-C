@@ -1,0 +1,160 @@
+Set B - DBMS
+1. Consider the following tables -
+Supplier (supplier_no int, supplier_name varchar(50),city char(10),phone_no int, bill_amount float)
+Constraint city_check.the city should be in Pune, Mumbai, Nashik and bill_amount greater than
+ZERO.
+Student (stud_no int, stud_name varchar(50),address char(10),phone_no int ,percentage float,class
+varchar(10))
+Constraint class_check.the class should be in FY, SY, TY.
+Execute the queries for the following
+1. Insert 5 records in Supplier table.
+2. Insert 5 records in Student table.
+3. Update Supplier table, increase the bill_amount by 5% percentage.
+4. Update Supplier table, change the name of city from Nashik to Nagpur.
+48
+5. Update Student table increase the percentage by 3 whose class is FY.
+6. Delete all Suppliers of Mumbai.
+7. Delete students whose percentage is less than 40.
+2. Create the following tables (primary keys are underlined.)
+Emp(eno, ename, designation, sal)
+Dept (dno, dname,dloc)
+There exists a one-to-many relationship between Emp and Dept.
+Create the Relations accordingly, so that the relationship is handled properly and the relations are in
+normalized form (3NF).
+a. Insert 5 records into department table
+b. Insert 2 employee records for each department.
+c. Increase salary of “managers” by 15%;
+d. Delete all employees of department 30;
+e. Delete all employees who are working as a “clerk”
+f. Change location of department Account to ‘Nashik’.
+
+CREATE TABLE Supplier (
+    supplier_no INT PRIMARY KEY,
+    supplier_name VARCHAR(50),
+    city CHAR(30),
+    phone_no BIGINT,
+    bill_amount FLOAT,
+    CONSTRAINT city_check CHECK (city IN ('Pune', 'Mumbai', 'Nashik')),
+    CONSTRAINT bill_check CHECK (bill_amount > 0)
+);
+
+CREATE TABLE Student (
+    stud_no INT PRIMARY KEY,
+    stud_name VARCHAR(50),
+    address CHAR(30),
+    phone_no BIGINT,
+    percentage FLOAT,
+    class VARCHAR(10),
+    CONSTRAINT class_check CHECK (class IN ('FY', 'SY', 'TY'))
+);
+
+
+INSERT INTO Supplier VALUES
+(1, 'SupplierA', 'Pune',   9876543210, 20000),
+(2, 'SupplierB', 'Mumbai', 9123456780, 15000),
+(3, 'SupplierC', 'Nashik', 9988776655, 18000),
+(4, 'SupplierD', 'Pune',   9112233445, 25000),
+(5, 'SupplierE', 'Mumbai', 9001122334, 30000);
+
+
+
+
+INSERT INTO Student VALUES
+(1, 'Alice', 'Pune',   9876543210, 72, 'FY'),
+(2, 'Bob',   'Mumbai', 9123456780, 68, 'SY'),
+(3, 'Charlie','Nashik',9988776655, 35, 'FY'),
+(4, 'David', 'Pune',   9112233445, 85, 'TY'),
+(5, 'Eva',   'Mumbai', 9001122334, 40, 'SY');
+
+
+
+
+3. Update bill_amount by +5%
+UPDATE Supplier
+SET bill_amount = bill_amount * 1.05;
+
+4. Change city from Nashik → Nagpur
+alter table supplier drop constraint city_check;
+
+alter table supplier add constraint city_check check(city in('Pune', 'Mumbai', 'Nashik', 'Nagpur')); 
+
+
+UPDATE Supplier
+SET city = 'Nagpur'
+WHERE city = 'Nashik';
+
+6. Delete all Suppliers of Mumbai
+
+DELETE FROM Supplier
+WHERE city = 'Mumbai';
+
+7. Delete students whose percentage < 40
+DELETE FROM Student
+WHERE percentage < 40;
+
+
+
+Part 2: Emp & Dept (1-to-many, 3NF)
+
+Create Tables
+•	One department → many employees
+•	So Emp should reference Dept(dno) as foreign key
+
+CREATE TABLE Dept (
+    dno INT PRIMARY KEY,
+    dname VARCHAR(50),
+    dloc VARCHAR(50)
+);
+
+CREATE TABLE Emp (
+    eno INT PRIMARY KEY,
+    ename VARCHAR(50),
+    designation VARCHAR(30),
+    sal FLOAT,
+    dno INT REFERENCES Dept(dno) ON DELETE CASCADE
+);
+
+
+a. Insert 5 departments
+INSERT INTO Dept VALUES
+(10, 'HR',       'Pune'),
+(20, 'Sales',    'Mumbai'),
+(30, 'IT',       'Delhi'),
+(40, 'Account',  'Nagpur'),
+(50, 'Finance',  'Bangalore');
+
+
+b. Insert 2 employees for each dept
+INSERT INTO Emp VALUES
+(1, 'John',   'Manager', 50000, 10),
+(2, 'Meera',  'Clerk',   25000, 10),
+
+(3, 'Amit',   'Manager', 60000, 20),
+(4, 'Sara',   'Clerk',   23000, 20),
+
+(5, 'Vijay',  'Analyst', 40000, 30),
+(6, 'Nina',   'Clerk',   22000, 30),
+
+(7, 'Ravi',   'Manager', 55000, 40),
+(8, 'Tina',   'Clerk',   24000, 40),
+
+(9, 'Kiran',  'Analyst', 38000, 50),
+(10, 'Leena', 'Manager', 62000, 50);
+c. Increase salary of Managers by 15%
+UPDATE Emp
+SET sal = sal * 1.15
+WHERE designation = 'Manager';
+
+d. Delete all employees of department 30
+DELETE FROM Emp
+WHERE dno = 30;
+
+ 
+e. Delete all employees who are Clerks
+DELETE FROM Emp
+WHERE designation = 'Clerk';
+
+f. Change location of Account dept to Nashik
+UPDATE Dept
+SET dloc = 'Nashik'
+WHERE dname = 'Account';
