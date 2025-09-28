@@ -1,1 +1,89 @@
+Create a table
+Employee (empno, name, age, address, salary, deptno)
+Insert atleast 10 records into the Employee table.
+Execute following queries
+1. Display all the details of employee.
+2. Display distinct department numbers of employees.
+3. Display the details of employee of deptno 5.
+4. Display the details of employee who lives in Pune and having salary greater than 50000.
+5. Display the details of employee whose age is between 25 and 35.
+6. Display the employee number and employee name whose name start with S.
+7. Display the details of employee whose name contain substring “nit”.
+8. Display the maximum salary of employee.
+9. Display average salary of employees.
+10. Give the count of employees having age less than 35.
+11. Display the total expenditure paid on employee salary.
+12. Display the department wise total count of employees.
 
+
+CREATE TABLE Dept (
+    dno INT PRIMARY KEY,
+    dname VARCHAR(50),
+    dloc VARCHAR(50)
+);
+
+✔️ Emp Table (Primary Key: eno, Foreign Key: dno)
+CREATE TABLE Emp (
+    eno INT PRIMARY KEY,
+    ename VARCHAR(50),
+    designation VARCHAR(30),
+    sal FLOAT,
+    dno INT REFERENCES Dept(dno) ON DELETE CASCADE
+);
+✅ Step 2: Insert 5 Records into Dept TableINSERT INTO Dept VALUES
+(10, 'HR',      'Pune'),
+(20, 'Sales',   'Mumbai'),
+(30, 'IT',      'Delhi'),
+(40, 'Account', 'Nagpur'),
+(50, 'Finance', 'Bangalore');
+
+✅ Step 3: Insert 2 Employee Records for Each Department
+INSERT INTO Emp VALUES
+(1, 'John',   'Manager', 50000, 10),
+(2, 'Meera',  'Clerk',   25000, 10),
+
+(3, 'Amit',   'Manager', 60000, 20),
+(4, 'Sara',   'Clerk',   23000, 20),
+
+(5, 'Vijay',  'Analyst', 40000, 30),
+(6, 'Nina',   'Clerk',   22000, 30),
+
+(7, 'Ravi',   'Manager', 55000, 40),
+(8, 'Tina',   'Clerk',   24000, 40),
+
+(9, 'Kiran',  'Analyst', 38000, 50),
+(10,'Leena',  'Manager', 62000, 50);
+
+✅ Step 4: Increase Salary of Managers by 15%
+UPDATE Emp
+SET sal = sal * 1.15
+WHERE designation = 'Manager';
+
+✅ Step 5: Delete All Employees of Department 30
+DELETE FROM Emp
+WHERE dno = 30;
+
+✅ Step 6: Delete All Employees who are Clerks
+DELETE FROM Emp
+WHERE designation = 'Clerk';
+
+✅ Step 7: Change Location of Dept ‘Account’ to Nashik
+UPDATE Dept
+SET dloc = 'Nashik'
+WHERE dname = 'Account';
+
+Consider Movie Database
+Movies (M_name, release_year, budget)
+Actor (A_name, role, charges, A_address, age)
+Relationship: Many to Many
+Create the relations accordingly, so that the relationship is handled properly and the
+relations are in normalized form(3NF).
+Insert sufficient number of appropriate records.
+Solve the Queries:
+1. Display the names of actors whose name end with ‘n’.
+2. List the names of the movies with the highest budget.
+3. List the names of actors whose charges greater than 200000.
+4. List the names of movies release in year 2023.
+5. List the names of actors who has maximum charges.
+6. List the names of actors who do not live in _________or _________ city.
+7. List the names of movies whose budget is between 1cr to 5cr
