@@ -4,142 +4,167 @@ ii. Accept an element from user and Concatenate it with a created link list.
 iii. Merge two linked list and display it
 
 
+<main_b>
 #include <stdio.h>
 #include <stdlib.h>
 
-// Structure for doubly linked list node
+// Node structure
 struct Node {
     int data;
-    struct Node *prev;
-    struct Node *next;
+    struct Node* next;
 };
 
-// Append node at end
-void append(struct Node **head, int data) {
-    struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
+// Function to create new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
     newNode->data = data;
     newNode->next = NULL;
-    newNode->prev = NULL;
+    return newNode;
+}
 
+// Insert node at end
+void insertEnd(struct Node** head, int data) {
+    struct Node* newNode = createNode(data);
     if (*head == NULL) {
         *head = newNode;
         return;
     }
-
-    struct Node *temp = *head;
-    while (temp->next)
+    struct Node* temp = *head;
+    while (temp->next != NULL)
         temp = temp->next;
-
     temp->next = newNode;
-    newNode->prev = temp;
 }
 
-// Display forward
-void display(struct Node *head) {
-    while (head) {
-        printf("%d <-> ", head->data);
+// Display linked list
+void displayList(struct Node* head) {
+    if (head == NULL) {
+        printf("List is empty!\n");
+        return;
+    }
+    while (head != NULL) {
+        printf("%d -> ", head->data);
         head = head->next;
     }
     printf("NULL\n");
 }
 
-// Reverse a doubly linked list
-void reverse(struct Node **head) {
-    struct Node *temp = NULL;
-    struct Node *curr = *head;
+// Reverse linked list (but return copy so original remains unchanged)
+struct Node* reverseCopy(struct Node* head) {
+    struct Node* prev = NULL;
+    struct Node* current = head;
+    struct Node* next = NULL;
+    struct Node* copy = NULL;
 
-    while (curr != NULL) {
-        temp = curr->prev;
-        curr->prev = curr->next;
-        curr->next = temp;
-        curr = curr->prev;
+    // First copy list
+    while (current != NULL) {
+        insertEnd(&copy, current->data);
+        current = current->next;
     }
 
-    if (temp != NULL) {
-        *head = temp->prev;
+    // Now reverse the copied list
+    current = copy;
+    while (current != NULL) {
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
     }
+    return prev; // head of reversed copy
 }
 
-// Concatenate (append element to list)
-void concatenate(struct Node **head, int data) {
-    append(head, data);
+// Concatenate single element
+void concatenateElement(struct Node** head, int data) {
+    insertEnd(head, data);
 }
 
-// Merge two lists
-struct Node* merge(struct Node *list1, struct Node *list2) {
-    if (list1 == NULL) return list2;
-    if (list2 == NULL) return list1;
+// Merge two sorted lists
+struct Node* mergeLists(struct Node* l1, struct Node* l2) {
+    if (l1 == NULL) return l2;
+    if (l2 == NULL) return l1;
 
-    struct Node *temp = list1;
-    while (temp->next)
-        temp = temp->next;
+    struct Node* result = NULL;
 
-    temp->next = list2;
-    list2->prev = temp;
-    return list1;
+    if (l1->data <= l2->data) {
+        result = l1;
+        result->next = mergeLists(l1->next, l2);
+    } else {
+        result = l2;
+        result->next = mergeLists(l1, l2->next);
+    }
+    return result;
 }
 
-
-#include "doublylist.h"
+#include "doublysist_b.h"
 int main() {
-    struct Node *list1 = NULL, *list2 = NULL;
-    int choice, val, n;
+    struct Node* firstList = NULL;
+    struct Node* secondList = NULL;
+    int choice, n, val;
 
     while (1) {
-        printf("\nMenu:\n");
-        printf("1. Reverse a linked list and display it\n");
-        printf("2. Accept an element from user and Concatenate it with List1\n");
-        printf("3. Merge two linked lists and display it\n");
-        printf("4. Append to List1 (for testing)\n");
-        printf("5. Display List1\n");
-        printf("6. Exit\n");
-        printf("Enter choice: ");
+        printf("\n--- MENU ---\n");
+        printf("1. Reverse First Linked List (Display Only)\n");
+        printf("2. Concatenate Element with First Linked List\n");
+        printf("3. Merge First and Second Linked List\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
         scanf("%d", &choice);
 
         switch (choice) {
             case 1:
-                reverse(&list1);
-                printf("List1 reversed:\n");
-                display(list1);
+                firstList = NULL;
+                printf("Enter number of elements in first list: ");
+                scanf("%d", &n);
+                printf("Enter elements: ");
+                for (int i = 0; i < n; i++) {
+                    scanf("%d", &val);
+                    insertEnd(&firstList, val);
+                }
+                printf("Original First List: ");
+                displayList(firstList);
+
+                printf("Reversed First List: ");
+                struct Node* reversed = reverseCopy(firstList);
+                displayList(reversed);
                 break;
 
             case 2:
-                printf("Enter element to concatenate: ");
-                scanf("%d", &val);
-                concatenate(&list1, val);
-                printf("Updated List1:\n");
-                display(list1);
+                if (firstList == NULL) {
+                    printf("First list is empty! Create it first (Option 1).\n");
+                } else {
+                    printf("Enter element to concatenate: ");
+                    scanf("%d", &val);
+                    concatenateElement(&firstList, val);
+                    printf("After Concatenation: ");
+                    displayList(firstList);
+                }
                 break;
 
             case 3:
-                printf("Enter number of elements for List2: ");
-                scanf("%d", &n);
-                for (int i = 0; i < n; i++) {
-                    printf("Element %d: ", i + 1);
-                    scanf("%d", &val);
-                    append(&list2, val);
+                if (firstList == NULL) {
+                    printf("First list is empty! Create it first (Option 1).\n");
+                } else {
+                    secondList = NULL;
+                    printf("Enter number of elements in second list: ");
+                    scanf("%d", &n);
+                    printf("Enter elements: ");
+                    for (int i = 0; i < n; i++) {
+                        scanf("%d", &val);
+                        insertEnd(&secondList, val);
+                    }
+                    printf("Second List: ");
+                    displayList(secondList);
+
+                    firstList = mergeLists(firstList, secondList);
+                    printf("After Merging: ");
+                    displayList(firstList);
                 }
-                list1 = merge(list1, list2);
-                printf("Merged List:\n");
-                display(list1);
                 break;
 
             case 4:
-                printf("Enter value to append to List1: ");
-                scanf("%d", &val);
-                append(&list1, val);
-                break;
-
-            case 5:
-                printf("List1: ");
-                display(list1);
-                break;
-
-            case 6:
                 exit(0);
 
             default:
-                printf("Invalid choice.\n");
+                printf("Invalid choice! Try again.\n");
         }
     }
     return 0;
