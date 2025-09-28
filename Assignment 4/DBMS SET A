@@ -16,61 +16,78 @@ Execute following queries
 12. Display the department wise total count of employees.
 
 
-CREATE TABLE Dept (
-    dno INT PRIMARY KEY,
-    dname VARCHAR(50),
-    dloc VARCHAR(50)
+Assignment 4 Set B
+
+
+✅ Step 1: Create Employee Table
+CREATE TABLE Employee (
+    empno INT PRIMARY KEY,
+    name VARCHAR(50),
+    age INT,
+    address VARCHAR(100),
+    salary FLOAT,
+    deptno INT
 );
+________________________________________
+✅ Step 2: Insert At Least 10 Records
+INSERT INTO Employee VALUES
+(1, 'Sandeep', 30, 'Pune',    60000, 1),
+(2, 'Anita',   28, 'Mumbai', 55000, 2),
+(3, 'Rohit',   26, 'Pune',    48000, 5),
+(4, 'Sunita',  32, 'Delhi',   75000, 5),
+(5, 'Nitin',   29, 'Pune',    52000, 3),
+(6, 'Amit',    40, 'Mumbai', 68000, 4),
+(7, 'Sneha',   24, 'Pune',    45000, 2),
+(8, 'Sourav',  33, 'Delhi',   62000, 1),
+(9, 'Raj',     36, 'Mumbai', 71000, 5),
+(10,'Sanjit',  31, 'Pune',    50000, 3);
+________________________________________
 
-✔️ Emp Table (Primary Key: eno, Foreign Key: dno)
-CREATE TABLE Emp (
-    eno INT PRIMARY KEY,
-    ename VARCHAR(50),
-    designation VARCHAR(30),
-    sal FLOAT,
-    dno INT REFERENCES Dept(dno) ON DELETE CASCADE
-);
-✅ Step 2: Insert 5 Records into Dept TableINSERT INTO Dept VALUES
-(10, 'HR',      'Pune'),
-(20, 'Sales',   'Mumbai'),
-(30, 'IT',      'Delhi'),
-(40, 'Account', 'Nagpur'),
-(50, 'Finance', 'Bangalore');
+1️⃣ Display All Employee Details
+SELECT * FROM Employee;
 
-✅ Step 3: Insert 2 Employee Records for Each Department
-INSERT INTO Emp VALUES
-(1, 'John',   'Manager', 50000, 10),
-(2, 'Meera',  'Clerk',   25000, 10),
+2️⃣ Display Distinct Department Numbers
+SELECT DISTINCT deptno FROM Employee;
 
-(3, 'Amit',   'Manager', 60000, 20),
-(4, 'Sara',   'Clerk',   23000, 20),
+3️⃣ Display Employees of deptno = 5
+SELECT * FROM Employee
+WHERE deptno = 5;
 
-(5, 'Vijay',  'Analyst', 40000, 30),
-(6, 'Nina',   'Clerk',   22000, 30),
+4️⃣ Employees in Pune and Salary > 50000
+SELECT * FROM Employee
+WHERE address = 'Pune' AND salary > 50000;
 
-(7, 'Ravi',   'Manager', 55000, 40),
-(8, 'Tina',   'Clerk',   24000, 40),
+5️⃣ Employees aged between 25 and 35
+SELECT * FROM Employee
+WHERE age BETWEEN 25 AND 35;
+________________________________________
+6️⃣ Employee Number and Name where Name Starts with 'S'
+SELECT empno, name FROM Employee
+WHERE name LIKE 'S%';
+________________________________________
+7️⃣ Employees whose name contains 'nit'
+SELECT * FROM Employee
+WHERE name ILIKE '%nit%';
+✅ Note: ILIKE is case-insensitive in PostgreSQL.
+________________________________________
+8️⃣ Maximum Employee Salary
+SELECT MAX(salary) AS max_salary FROM Employee;
+________________________________________
+9️⃣ Average Employee Salary
+SELECT AVG(salary) AS avg_salary FROM Employee;
+________________________________________
+🔟 Count of Employees Age < 35
+SELECT COUNT(*) AS count_under_35 FROM Employee
+WHERE age < 35;
+________________________________________
+1️⃣1️⃣ Total Expenditure on Employee Salaries
+SELECT SUM(salary) AS total_salary_expenditure FROM Employee;
+________________________________________
+1️⃣2️⃣ Dept-wise Total Count of Employees
+SELECT deptno, COUNT(*) AS employee_count
+FROM Employee
+GROUP BY deptno;
 
-(9, 'Kiran',  'Analyst', 38000, 50),
-(10,'Leena',  'Manager', 62000, 50);
-
-✅ Step 4: Increase Salary of Managers by 15%
-UPDATE Emp
-SET sal = sal * 1.15
-WHERE designation = 'Manager';
-
-✅ Step 5: Delete All Employees of Department 30
-DELETE FROM Emp
-WHERE dno = 30;
-
-✅ Step 6: Delete All Employees who are Clerks
-DELETE FROM Emp
-WHERE designation = 'Clerk';
-
-✅ Step 7: Change Location of Dept ‘Account’ to Nashik
-UPDATE Dept
-SET dloc = 'Nashik'
-WHERE dname = 'Account';
 
 Consider Movie Database
 Movies (M_name, release_year, budget)
@@ -87,3 +104,70 @@ Solve the Queries:
 5. List the names of actors who has maximum charges.
 6. List the names of actors who do not live in _________or _________ city.
 7. List the names of movies whose budget is between 1cr to 5cr
+
+DBMS Assign4 Set B
+
+Create database “movies”;
+
+CREATE TABLE Movies (
+    movie_id SERIAL PRIMARY KEY,
+    m_name VARCHAR(100),
+    release_year INT,
+    budget NUMERIC
+);
+
+CREATE TABLE Actors (
+    actor_id SERIAL PRIMARY KEY,
+    a_name VARCHAR(100),
+    role VARCHAR(50),
+    charges NUMERIC,
+    a_address VARCHAR(100),
+    age INT
+);
+
+-- Relationship Table (Many-to-Many)
+CREATE TABLE Movie_Actor (
+    movie_id INT REFERENCES Movies(movie_id),
+    actor_id INT REFERENCES Actors(actor_id),
+    PRIMARY KEY(movie_id, actor_id)
+);
+
+INSERT INTO Movies (m_name, release_year, budget) VALUES
+('Pathaan', 2023, 2500000000),
+('RRR', 2022, 4500000000),
+('Jawaan', 2023, 3000000000);
+
+INSERT INTO Actors (a_name, role, charges, a_address, age) VALUES
+('Shahrukh ', 'Hero', 500000000, 'Mumbai', 47),
+('NTR', 'Hero', 300000000, 'Hyderabad', 37),
+('Ram Charan', 'Hero', 350000000, 'Hyderabad', 38),
+('Deepika ', 'Heroine', 200000000, 'Bangalore', 34);
+
+INSERT INTO Movie_Actor VALUES
+(1,1), (1,4),        -- Pathaan: Shahrukh, Deepika
+(2,2), (2,3),        -- RRR: NTR, Ram Charan
+(3,1), (3,4);       -- Jawaan: Shahrukh, Deepika
+
+
+-- 1. Display the names of actors whose name end with 'n'-------------------
+SELECT a_name FROM Actors WHERE a_name LIKE '%n';
+
+-- 2. List the names of the movies with the highest budget ----------------
+SELECT m_name FROM Movies WHERE budget = (SELECT MAX(budget) FROM Movies);
+
+-- 3. List the names of actors whose charges greater than 200000----------------------
+SELECT a_name FROM Actors WHERE charges > 200000;
+
+-- 4. List the names of movies release in year 2023----------------
+SELECT m_name FROM Movies WHERE release_year = 2023;
+
+-- 5. List the names of actors who has maximum charges-----------------
+SELECT a_name FROM Actors WHERE charges = (SELECT MAX(charges) FROM Actors);
+
+-- 6. List the names of actors who do not live in Mumbai or Hyderabad------------------------
+SELECT a_name FROM Actors WHERE a_address NOT IN ('Mumbai','Hyderabad');
+
+-- 7. List the names of movies whose budget is between 1cr to 5cr--------------------
+SELECT m_name FROM Movies WHERE budget BETWEEN 10000000 AND 50000000;
+
+
