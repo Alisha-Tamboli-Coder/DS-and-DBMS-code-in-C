@@ -1,0 +1,55 @@
+#include <stdio.h>
+
+// Find maximum element
+int getMax(int arr[], int n) {
+    int max = arr[0];
+    for (int i = 1; i < n; i++)
+        if (arr[i] > max) 
+		max = arr[i];
+    return max;
+}
+
+// Recursive Counting Sort (digit by digit like radix sort)
+void countSortRec(int arr[], int n, int exp, int max) {
+    if (exp > max) 
+	return;
+
+    int output[n], count[10] = {0};
+
+	//Count digit occurrences
+    for (int i = 0; i < n; i++)
+        count[(arr[i] / exp) % 10]++;
+
+	//Convert counts into positions
+    for (int i = 1; i < 10; i++)
+        count[i] += count[i - 1];
+
+	//Build output array (stable sort)
+    for (int i = n - 1; i >= 0; i--)
+        output[--count[(arr[i] / exp) % 10]] = arr[i];
+
+	//Copy sorted data back
+    for (int i = 0; i < n; i++)
+        arr[i] = output[i];
+
+	//Recursive call for next digit
+    countSortRec(arr, n, exp * 10, max);
+}
+
+int main() {
+    int n;
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    int arr[n];
+    printf("Enter elements: ");
+    for (int i = 0; i < n; i++) 
+	scanf("%d", &arr[i]);
+
+    int max = getMax(arr, n);
+    countSortRec(arr, n, 1, max);
+
+    printf("Sorted array: ");
+    for (int i = 0; i < n; i++) 
+	printf("%d ", arr[i]);
+}
