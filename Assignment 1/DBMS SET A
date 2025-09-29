@@ -1,0 +1,16 @@
+-- Creating Player table
+CREATE TABLE Player (
+    player_id INTEGER PRIMARY KEY,
+    Name VARCHAR(50) NOT NULL,
+    Birth_date DATE,
+    Birth_place VARCHAR(100)
+);
+
+-- Creating Student table
+CREATE TABLE Student (
+    Roll_no INTEGER,
+    Class VARCHAR(20),
+    Weight NUMERIC(6,2),
+    Height NUMERIC(6,2),
+    PRIMARY KEY (Roll_no, Class)
+);
