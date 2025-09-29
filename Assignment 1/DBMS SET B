@@ -1,0 +1,17 @@
+CREATE TABLE Machine (
+    Machine_id INTEGER PRIMARY KEY,
+    Machine_name VARCHAR(50) NOT NULL CHECK (Machine_name = UPPER(Machine_name)),
+    Machine_type VARCHAR(10) CHECK (Machine_type IN ('drilling', 'milling', 'lathe', 'turning',   'grinding')),
+    Machine_price FLOAT CHECK (Machine_price > 0),
+    Machine_cost FLOAT,
+    CHECK (Machine_cost < Machine_price)
+);
+
+CREATE TABLE Employee (
+    Employee_id INTEGER PRIMARY KEY,
+    Employee_name VARCHAR(50) NOT NULL CHECK (Employee_name = UPPER(Employee_name)),
+    Employee_desg VARCHAR(10) CHECK (Employee_desg IN ('Manager', 'staff', 'worker')),
+    Employee_sal FLOAT CHECK (Employee_sal > 0),
+    Employee_uid TEXT UNIQUE,
+    CHECK (Employee_uid::TEXT != Employee_id::TEXT)
+);
