@@ -1,0 +1,89 @@
+Set B
+a) Perform the following operations on a circular Queue (static or dynamic implementation)
+i. Create a queue of n integers.
+ii. Delete the element from the queue and display it.
+
+#include <stdio.h>
+#define MAX 5
+
+int cq[MAX], front=-1, rear=-1;
+
+void enqueue(int val) {
+    if ((rear+1)%MAX == front) printf("Queue Full\n");
+    else {
+        if (front==-1) front=0;
+        rear=(rear+1)%MAX;
+        cq[rear]=val;
+    }
+}
+
+void dequeueAll() {
+    if (front==-1) 
+        printf("Queue Empty\n");
+    else {
+        printf("Deleted:  ");
+        while(front != -1) {
+            printf("%d ", cq[front]);
+            if (front==rear) front=rear=-1;
+            else front=(front+1)%MAX;
+        }
+    }
+}
+
+int main() {
+   
+  int n, val;
+    printf("Enter number of elements: ");
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+        scanf("%d",&val);
+        enqueue(val);
+    }
+    dequeueAll();
+    return 0;
+}
+
+
+b) Write a program to create a Priority Queue and display it.
+i. Add an element with its priority into the queue.
+ii. Delete an element from the queue according to its priority
+
+#include <stdio.h>
+#define MAX 5
+
+struct PQ {
+    int data, pr;
+} pq[MAX];
+
+int size=0;
+
+void insert(int val, int p) {
+    if(size==MAX) printf("PQ Full\n");
+    else {
+        pq[size].data=val;
+        pq[size].pr=p;
+        size++;
+    }
+}
+
+void deleteAll() {
+    if(size==0) 
+        printf("PQ Empty\n");
+    else {
+        printf("Deleted: \n");
+        while(size>0) {
+            int pos=0;
+            for(int i=1;i<size;i++)
+                if(pq[i].pr < pq[pos].pr) pos=i;
+            printf("%d (priority %d) \n", pq[pos].data, pq[pos].pr);
+            for(int i=pos;i<size-1;i++) pq[i]=pq[i+1];
+            size--;
+        }
+    }
+}
+
+int main() {
+    insert(10,2); insert(20,1); insert(30,3);
+    deleteAll();
+    return 0;
+}
