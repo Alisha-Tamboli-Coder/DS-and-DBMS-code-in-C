@@ -1,0 +1,175 @@
+Assignment 3 - Set A
+a)	Accept the array of n integers from user and sort the array in ascending order by using recursive Counting sort algorithm.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+void countSort(int a[], int n) {
+    int max = a[0];
+    for (int i = 1; i < n; i++) {
+        if (a[i] > max)
+            max = a[i];
+    }
+
+    int count[max + 1];
+    for (int i = 0; i <= max; i++)
+        count[i] = 0;
+
+    for (int j = 0; j < n; j++)
+        count[a[j]]++;
+
+    for (int i = 1; i <= max; i++)
+        count[i] = count[i] + count[i - 1];
+
+    int output[n];
+    for (int j = n - 1; j >= 0; j--) {
+        output[count[a[j]] - 1] = a[j];
+        count[a[j]]--;
+    }
+
+    for (int i = 0; i < n; i++)
+        a[i] = output[i];
+}
+
+int main() {
+    int n;
+
+    // Ask the user for the number of elements
+    printf("Enter the number of elements: ");
+    scanf("%d", &n);
+
+    // Dynamically allocate memory for the array
+    int *arr = (int *)malloc(n * sizeof(int));
+    if (arr == NULL) {
+        printf("Memory allocation failed.\n");
+        return 1;
+    }
+
+    // Input elements
+    for (int i = 0; i < n; i++) {
+        printf("Enter element %d: ", i + 1);
+        scanf("%d", &arr[i]);
+    }
+
+    countSort(arr, n);
+
+    printf("Sorted Array (Counting Sort): ");
+    for (int i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+    printf("\n");
+
+    // Free allocated memory
+    free(arr);
+
+    return 0;
+}
+
+b)	Create random array of n integers and sort the array in ascending order by using recursive Merge sort algorithm
+
+#include <stdio.h>
+void merge(int a[], int low, int mid, int high) {
+    int i = low, j = mid + 1, k = 0;
+    int b[high - low + 1];
+
+    while (i <= mid && j <= high) {
+        if (a[i] <= a[j])
+            b[k++] = a[i++];
+        else
+            b[k++] = a[j++];
+    }
+    while (i <= mid)
+        b[k++] = a[i++];
+    while (j <= high)
+        b[k++] = a[j++];
+
+    for (i = low, k = 0; i <= high; i++, k++)
+        a[i] = b[k];
+}
+
+void mergesort(int a[], int low, int high) {
+    if (low < high) {
+        int mid = (low + high) / 2;
+        mergesort(a, low, mid);
+        mergesort(a, mid + 1, high);
+        merge(a, low, mid, high);
+    }
+}
+
+int main() {
+    int a[] = {38, 27, 43, 3, 9, 82, 10};  // ✅ Hardcoded array
+    int n = sizeof(a) / sizeof(a[0]);
+
+    mergesort(a, 0, n - 1);
+
+    printf("Sorted Array (Merge Sort): ");
+    for (int i = 0; i < n; i++)
+        printf("%d ", a[i]);
+
+    return 0;
+}
+
+c)	Accept the array of n integers from user and sort the array in ascending order by using recursive Quick sort algorithm.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int partition(int a[], int lb, int ub) {
+    int pivot = a[lb];
+    int down = lb, up = ub;
+
+    while (down < up) {
+        while (a[down] <= pivot && down < up)
+            down++;
+        while (a[up] > pivot)
+            up--;
+        if (down < up) {
+            int temp = a[down];
+            a[down] = a[up];
+            a[up] = temp;
+        }
+    }
+
+    a[lb] = a[up];
+    a[up] = pivot;
+    return up;
+}
+
+void quicksort(int a[], int lb, int ub) {
+    if (lb < ub) {
+        int j = partition(a, lb, ub);
+        quicksort(a, lb, j - 1);
+        quicksort(a, j + 1, ub);
+    }
+}
+
+int main() {
+    int n;
+
+    // Ask the user for the number of elements
+    printf("Enter the number of elements: ");
+    scanf("%d", &n);
+
+    // Dynamically allocate memory for the array
+    int *arr = (int *)malloc(n * sizeof(int));
+    if (arr == NULL) {
+        printf("Memory allocation failed.\n");
+        return 1;
+    }
+
+    // Input elements
+    for (int i = 0; i < n; i++) {
+        printf("Enter element %d: ", i + 1);
+        scanf("%d", &arr[i]);
+    }
+
+    quicksort(arr, 0, n - 1);  // Use `arr`, not `a`
+
+    printf("Sorted Array (Quick Sort): ");
+    for (int i = 0; i < n; i++)
+        printf("%d ", arr[i]);  // Use `arr`, not `a`
+    printf("\n");
+
+    free(arr);  // Free the dynamically allocated memory
+
+    return 0;
+}
