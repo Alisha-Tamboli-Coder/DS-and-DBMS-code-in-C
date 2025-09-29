@@ -1,0 +1,52 @@
+Assignment 2 - Set B
+
+# Student Table #
+CREATE TABLE Student (
+    Sno INTEGER PRIMARY KEY,
+    Name VARCHAR(50) NOT NULL,
+    Address VARCHAR(50),
+    Class VARCHAR(10)
+);
+
+# Teacher Table#
+CREATE TABLE Teacher (
+    Tno INTEGER PRIMARY KEY,
+    Tname VARCHAR(50) NOT NULL,
+    Qualification VARCHAR(50),
+    TotalExperience FLOAT,
+    Salary FLOAT CHECK (Salary > 0)
+);
+
+# Relationship Table (Student–Teacher)#
+CREATE TABLE Student_Teacher (
+    Sno INTEGER REFERENCES Student(Sno) ON DELETE CASCADE,
+    Tno INTEGER REFERENCES Teacher(Tno) ON DELETE CASCADE,
+    Marks INTEGER,
+    PRIMARY KEY (Sno, Tno)
+);
+
+3.	Project – Employee with Many-to-Many (Start Date, Hours Worked)
+# Project Table#
+CREATE TABLE Project (
+    Pno INTEGER PRIMARY KEY,
+    Pname VARCHAR(30) NOT NULL,
+    Ptype CHAR(20),
+    Duration INTEGER
+);
+# Employee Table#
+CREATE TABLE Employee (
+    Eno INTEGER PRIMARY KEY,
+    Ename VARCHAR(20),
+    Qualification VARCHAR(50),
+    Join_Date DATE,
+    Salary FLOAT CHECK (Salary > 0)
+);
+
+# Relationship Table (Project–Employee)#
+CREATE TABLE Project_Employee (
+    Pno INTEGER REFERENCES Project(Pno) ON DELETE CASCADE,
+    Eno INTEGER REFERENCES Employee(Eno) ON DELETE CASCADE,
+    Start_Date DATE,
+    No_of_Hours_Worked INTEGER,
+    PRIMARY KEY (Pno, Eno)
+);
