@@ -1,0 +1,107 @@
+Set B
+a) Read the data from file 'student.txt' containing names of student and their class (FY, SY,
+TY). Accept a student name from user and use linear search algorithm to check whether the 
+name is present in the file and output the Class of student otherwise output “Student not in 
+the list”.
+
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_LEN 50
+
+int main() {
+    FILE *fp = fopen("student.txt", "r");
+    if (!fp) {
+        printf("File not found.\n");
+        return 1;
+    }
+
+    char name[MAX_LEN], className[MAX_LEN];
+    char searchName[MAX_LEN];
+    int found = 0;
+
+    printf("Enter student name to search: ");
+    scanf("%s", searchName);
+
+    while (fscanf(fp, "%s %s", name, className) != EOF) {
+        if (strcmp(name, searchName) == 0) {
+            printf("Student found in class %s\n", className);
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found)
+        printf("Student not in the list\n");
+
+    fclose(fp);
+    return 0;
+}
+
+
+b) Read the data from file 'student.txt' containing names of student and their class(FY, SY,TY). 
+Accept a student name from user and use binary search algorithm to check whether the name 
+is present in the file and output the class of student otherwise output “Student not in the list”.
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_LEN 50
+#define MAX_STUDENTS 100
+
+typedef struct {
+    char name[MAX_LEN];
+    char className[MAX_LEN];
+} Student;
+
+int compare(const void *a, const void *b) {
+    return strcmp(((Student*)a)->name, ((Student*)b)->name);
+}
+
+int binarySearch(Student arr[], int n, char *key) {
+    int low = 0, high = n - 1;
+    while (low <= high) {
+        int mid = (low + high) / 2;
+        int cmp = strcmp(arr[mid].name, key);
+        if (cmp == 0)
+            return mid;
+        else if (cmp > 0)
+            high = mid - 1;
+        else
+            low = mid + 1;
+    }
+    return -1;
+}
+
+int main() {
+    FILE *fp = fopen("student.txt", "r");
+    if (!fp) {
+        printf("File not found.\n");
+        return 1;
+    }
+
+    Student students[MAX_STUDENTS];
+    int count = 0;
+
+    while (fscanf(fp, "%s %s", students[count].name, students[count].className) != EOF) {
+        count++;
+        if (count >= MAX_STUDENTS) break;
+    }
+    fclose(fp);
+
+    // Sort students by name for binary search
+    qsort(students, count, sizeof(Student), compare);
+
+    char searchName[MAX_LEN];
+    printf("Enter student name to search: ");
+    scanf("%s", searchName);
+
+    int pos = binarySearch(students, count, searchName);
+    if (pos != -1)
+        printf("Student found in class %s\n", students[pos].className);
+    else
+        printf("Student not in the list\n");
+
+    return 0;
+}
