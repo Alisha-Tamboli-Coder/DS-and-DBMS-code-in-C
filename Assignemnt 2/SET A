@@ -1,0 +1,126 @@
+# DBMS
+
+Assignment 2 - Set A 
+Create tables for the information given below by giving appropriate integrity constraints as specified.
+
+-- Create Owner table first (Parent Table)---
+CREATE TABLE Owner (
+    owner_name VARCHAR(50) PRIMARY KEY,
+    address VARCHAR(50),
+    phoneno INTEGER
+);
+
+-- Create Property table (Child Table)----
+CREATE TABLE Property (
+    p_number  INTEGER  PRIMARY KEY,
+    description  VARCHAR(50)  NOT NULL,
+    area CHAR(10),
+    owner_name VARCHAR(50),
+    FOREIGN KEY (owner_name) REFERENCES Owner(owner_name)
+);
+Understanding the Question
+We need to create two tables:
+1.	Property
+o	P-number → integer, Primary Key (unique property ID)
+o	Description → varchar(50), NOT NULL (must always have a description)
+o	Area → char(10) (area name or code, fixed length)
+2.	Owner
+o	Owner-name → varchar(50), Primary Key (unique owner name)
+o	Address → varchar(50)
+o	Phoneno → integer
+________________________________________
+Relationship
+•	One-to-Many between Owner and Property
+•	Meaning: One owner can own many properties, but each property belongs to exactly one owner.
+•	Implementation in SQL: Add a foreign key in the Property table that references the Owner table.
+Explanation of Code
+1.	Order matters:
+o	You must create the parent table (Owner) first because the child table’s foreign key will reference it.
+2.	Integrity Constraints used:
+o	PRIMARY KEY: Ensures unique values for p_number in Property and owner_name in Owner.
+o	NOT NULL: Used on description so that property must have a description.
+o	FOREIGN KEY: Links Property.owner_name to Owner.owner_name for relationship integrity.
+3.	Why the foreign key is in Property table:
+o	Because each property is linked to exactly one owner.
+o	The foreign key enforces that a property cannot be assigned to a non-existing owner.
+
+Q 2. 
+
+-- Create Hospital table----
+CREATE TABLE Hospital (
+    hno INTEGER PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    city CHAR(10)
+);
+
+-- Create Doctor table------
+CREATE TABLE Doctor (
+    dno INTEGER PRIMARY KEY,
+    dname VARCHAR(50),
+    city CHAR(10)
+);
+
+-- Create Junction Table for Many-to-Many relationship-----
+CREATE TABLE Hospital_Doctor (
+    hno INTEGER,
+    dno INTEGER,
+    PRIMARY KEY (hno, dno), -- Composite Primary Key----
+    FOREIGN KEY (hno) REFERENCES Hospital(hno),
+    FOREIGN KEY (dno) REFERENCES Doctor(dno)
+);
+Understanding the Question
+Tables:
+1.	Hospital
+o	Hno → integer, Primary Key
+o	Name → varchar(50), NOT NULL
+o	City → char(10)
+2.	Doctor
+o	Dno → integer, Primary Key
+o	Dname → varchar(50)
+o	City → char(10)
+________________________________________
+Relationship: Many-to-Many
+•	A doctor can work in multiple hospitals
+•	A hospital can have multiple doctors
+•	In SQL, we can’t directly have a many-to-many link — we use a junction table (also called a bridge table).
+Explanation
+1.	Hospital table: Stores hospital details.
+2.	Doctor table: Stores doctor details.
+3.	Hospital_Doctor table:
+o	Each row links one hospital to one doctor.
+o	If a doctor works in multiple hospitals, they will appear multiple times in this table (once per hospital).
+o	Composite Primary Key (hno, dno) ensures no duplicate doctor-hospital pairs.
+
+Q 3. 
+-- Create Patient table
+CREATE TABLE Patient (
+    pno INTEGER PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    address VARCHAR(50)
+);
+
+-- Create Bed table (One-to-One with Patient)
+CREATE TABLE Bed (
+    bedno INTEGER,
+    roomno INTEGER,
+    description VARCHAR(50),
+    pno INTEGER UNIQUE, -- Ensures each patient gets only one bed
+    PRIMARY KEY (bedno, roomno), -- Composite primary key
+    FOREIGN KEY (pno) REFERENCES Patient(pno)
+);
+Understanding the Question
+Tables
+1.	Patient
+o	Pno → integer, Primary Key
+o	Name → varchar(50), NOT NULL
+o	Address → varchar(50)
+2.	Bed
+o	Bedno → integer, Primary Key
+o	Roomno → integer, Primary Key (Here’s a catch — in a single table you can have only one primary key, but it can be composite with multiple columns.)
+o	Description → varchar(50)
+________________________________________
+Relationship: One-to-One
+•	Each patient gets exactly one bed.
+•	Each bed is assigned to exactly one patient.
+•	Implementation:
+o	We can make Pno a foreign key in Bed that also has a unique constraint to ensure one-to-one mapping.
