@@ -1,0 +1,238 @@
+SET A
+Q1.
+--
+-- Part A: Database Setup and Queries
+--
+
+-- DDL: Create the tables
+CREATE TABLE Dept (
+    dno INT PRIMARY KEY,
+    dname VARCHAR(50)
+);
+
+CREATE TABLE Emp (
+    eno INT PRIMARY KEY,
+    name VARCHAR(50),
+    dno INT REFERENCES Dept(dno),
+    salary DECIMAL(10, 2),
+    gender VARCHAR(10),
+    city VARCHAR(50),
+    qualification VARCHAR(50)  -- Added for Part B, Query 3
+);
+
+CREATE TABLE Project (
+    pno INT PRIMARY KEY,
+    pname VARCHAR(50),
+    control_dno INT REFERENCES Dept(dno),
+    budget DECIMAL(10, 2),
+    start_date DATE
+);
+
+CREATE TABLE Works_On (
+    eno INT REFERENCES Emp(eno),
+    pno INT REFERENCES Project(pno),
+    hours DECIMAL(10, 2),
+    PRIMARY KEY (eno, pno)
+);
+
+-- DML: Insert 3 records into each table
+INSERT INTO Dept (dno, dname) VALUES
+(10, 'Research'),
+(20, 'Sales'),
+(30, 'IT');
+
+INSERT INTO Emp (eno, name, dno, salary, gender, city, qualification) VALUES
+(101, 'Alice', 10, 80000.00, 'Female', 'New York', 'MCA'),
+(102, 'Bob', 20, 65000.00, 'Male', 'Los Angeles', 'BE'),
+(103, 'Charlie', 10, 90000.00, 'Male', 'New York', 'MCA');
+
+INSERT INTO Project (pno, pname, control_dno, budget, start_date) VALUES
+(1, 'Project Alpha', 10, 500000.00, '2024-01-15'),
+(2, 'Project Beta', 20, 300000.00, '2024-02-20'),
+(3, 'Project Gamma', 10, 750000.00, '2024-03-10');
+
+INSERT INTO Works_On (eno, pno, hours) VALUES
+(101, 1, 45.5),
+(102, 2, 10.0),
+(103, 1, 55.0);
+
+-- Queries with blanks filled (Part A)
+-- 1. List the names of departments that control projects whose budget is greater than 400000.
+SELECT DISTINCT D.dname
+FROM Dept D
+JOIN Project P ON D.dno = P.control_dno
+WHERE P.budget > 400000;
+
+-- 2. List the names of projects, controlled by department No 10, whose budget is greater than
+-- atleast one project controlled by department No 20.
+SELECT pname
+FROM Project
+WHERE control_dno = 10 AND budget > SOME (
+    SELECT budget
+    FROM Project
+    WHERE control_dno = 20
+);
+
+-- 3. List the details of the projects with the second maximum budget.
+SELECT *
+FROM Project
+WHERE budget = (
+    SELECT MAX(budget)
+    FROM Project
+    WHERE budget < (
+        SELECT MAX(budget)
+        FROM Project
+    )
+);
+
+-- 5. List the names of employees, working on some projects that employee number 101 is working.
+SELECT DISTINCT T2.name
+FROM Works_On T1
+JOIN Emp T2 ON T1.eno = T2.eno
+WHERE T1.pno IN (
+    SELECT pno
+    FROM Works_On
+    WHERE eno = 101
+) AND T1.eno != 101;
+
+-- 6. List the names of employees who do not work on any project that employee number 101 works on.
+SELECT name
+FROM Emp
+WHERE eno NOT IN (
+    SELECT eno
+    FROM Works_On
+    WHERE pno IN (
+        SELECT pno
+        FROM Works_On
+        WHERE eno = 101
+    )
+);
+
+-- 7. List the names of employees who do not work on any project controlled by 'Research' department.
+SELECT name
+FROM Emp
+WHERE eno NOT IN (
+    SELECT eno
+    FROM Works_On
+    WHERE pno IN (
+        SELECT pno
+        FROM Project
+        WHERE control_dno = (
+            SELECT dno
+            FROM Dept
+            WHERE dname = 'Research'
+        )
+    )
+);
+
+-- 8. List the names of projects along with the controlling department name, for those projects which has atleast 2 employees working on it.
+SELECT P.pname, D.dname
+FROM Project P
+JOIN Dept D ON P.control_dno = D.dno
+WHERE P.pno IN (
+    SELECT pno
+    FROM Works_On
+    GROUP BY pno
+    HAVING COUNT(eno) >= 2
+);
+
+-- 9. List the names of employees who is worked for more than 10 hrs. on atleast one project controlled by 'IT' dept.
+SELECT DISTINCT E.name
+FROM Emp E
+JOIN Works_On WO ON E.eno = WO.eno
+WHERE WO.hours > 10
+AND WO.pno IN (
+    SELECT pno
+    FROM Project
+    WHERE control_dno = (
+        SELECT dno
+        FROM Dept
+        WHERE dname = 'IT'
+    )
+);
+
+-- 10. List the names of employees, who are males, and earning the maximum salary in their department.
+SELECT name
+FROM Emp E1
+WHERE gender = 'Male'
+AND salary = (
+    SELECT MAX(salary)
+    FROM Emp E2
+    WHERE E1.dno = E2.dno
+);
+
+-- 11. List the names of employees who work in the same department as 'Alice'.
+SELECT name
+FROM Emp
+WHERE dno = (
+    SELECT dno
+    FROM Emp
+    WHERE name = 'Alice'
+) AND name != 'Alice';
+
+-- 12. List the names of employees who do not live in 'New York' or 'Chicago'.
+SELECT name
+FROM Emp
+WHERE city NOT IN ('New York', 'Chicago');
+
+--
+-- Part B: View Creation and Deletion
+--
+
+-- 1. Create view to display all employees working on “ERP” Project.
+-- We assume "ERP" corresponds to 'Project Alpha' in our sample data.
+CREATE VIEW employees_on_erp AS
+SELECT
+    E.eno,
+    E.name,
+    E.dno,
+    E.salary,
+    E.gender,
+    E.city
+FROM
+    Emp E
+JOIN
+    Works_On WO ON E.eno = WO.eno
+JOIN
+    Project P ON WO.pno = P.pno
+WHERE
+    P.pname = 'Project Alpha';
+
+-- 2. Create view to display the project details and start date of the project,
+-- sorted by start date where duration of project is more than 6 months.
+-- We'll use the current date to calculate duration.
+CREATE VIEW long_term_projects AS
+SELECT
+    pname,
+    start_date
+FROM
+    Project
+WHERE
+    (CURRENT_DATE - start_date) > 180; -- 180 days is approx. 6 months
+
+-- 3. Create view to display employee details having qualification MCA.
+CREATE VIEW mca_employees AS
+SELECT
+    *
+FROM
+    Emp
+WHERE
+    qualification = 'MCA';
+
+-- 4. Create view to display employee and project names where employees worked more than 300 hours.
+CREATE VIEW high_hour_workers AS
+SELECT
+    E.name AS employee_name,
+    P.pname AS project_name
+FROM
+    Emp E
+JOIN
+    Works_On WO ON E.eno = WO.eno
+JOIN
+    Project P ON WO.pno = P.pno
+WHERE
+    WO.hours > 300;
+
+-- 5. Delete view where employee having qualification MCA.
+-- This refers to dropping the view created in step 3.
+DROP VIEW mca_employees;
