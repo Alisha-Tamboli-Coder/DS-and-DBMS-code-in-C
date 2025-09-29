@@ -1,0 +1,164 @@
+SET B
+
+-- DDL: Create tables for the Bank database
+CREATE TABLE Branch (
+    bid INT PRIMARY KEY,
+    brname CHAR(30),
+    brcity CHAR(10)
+);
+
+CREATE TABLE Customer (
+    cno INT PRIMARY KEY,
+    cname CHAR(20),
+    caddr CHAR(35),
+    city CHAR(20)
+);
+
+CREATE TABLE Loan_Application (
+    lno INT PRIMARY KEY,
+    lamtrequired MONEY,
+    lamtapproved MONEY,
+    l_date DATE
+);
+
+-- Ternary relationship table
+CREATE TABLE Ternary (
+    bid INT REFERENCES Branch(bid),
+    cno INT REFERENCES Customer(cno),
+    lno INT REFERENCES Loan_Application(lno),
+    PRIMARY KEY (bid, cno, lno)
+);
+
+-- DML: Insert sample data
+INSERT INTO Branch (bid, brname, brcity) VALUES
+(1, 'Aundh', 'Pune'),
+(2, 'Deccan', 'Pune'),
+(3, 'M.G. ROAD', 'Mumbai');
+
+INSERT INTO Customer (cno, cname, caddr, city) VALUES
+(101, 'Alice', '123 Main St', 'Pune'),
+(102, 'Bob', '456 Oak Ave', 'Pune'),
+(103, 'Charlie', '789 Pine Rd', 'Mumbai');
+
+INSERT INTO Loan_Application (lno, lamtrequired, lamtapproved, l_date) VALUES
+(201, 1000000.00, 950000.00, '2025-09-15'),
+(202, 2000000.00, 2000000.00, '2025-09-20'),
+(203, 500000.00, 400000.00, '2025-08-25');
+
+INSERT INTO Ternary (bid, cno, lno) VALUES
+(1, 101, 201),
+(2, 102, 202),
+(3, 103, 203);
+
+---
+-- Solve the Queries (with smaller aliases)
+---
+
+-- 1. Find the names of the customers for the “Aundh” branch.
+SELECT C.cname
+FROM Branch AS B
+JOIN Ternary AS T ON B.bid = T.bid
+JOIN Customer AS C ON T.cno = C.cno
+WHERE B.brname = 'Aundh';
+
+-- 2. List the names of the customers who have received loan less than their requirement.
+SELECT C.cname
+FROM Loan_Application AS L
+JOIN Ternary AS T ON L.lno = T.lno
+JOIN Customer AS C ON T.cno = C.cno
+WHERE L.lamtapproved < L.lamtrequired;
+
+-- 3. Find the maximum loan amount approved.
+SELECT MAX(lamtapproved) FROM Loan_Application;
+
+-- 4. Find out the total loan amount sanctioned by “Deccan “branch.
+SELECT SUM(L.lamtapproved)
+FROM Branch AS B
+JOIN Ternary AS T ON B.bid = T.bid
+JOIN Loan_Application AS L ON T.lno = L.lno
+WHERE B.brname = 'Deccan';
+
+-- 5. Count the number of loan applications received by “M.G. ROAD” branch.
+SELECT COUNT(T.lno)
+FROM Branch AS B
+JOIN Ternary AS T ON B.bid = T.bid
+WHERE B.brname = 'M.G. ROAD';
+
+-- 6. List the names of the customer along with the branch names who have applied for loan
+-- in the month of September.
+SELECT C.cname, B.brname
+FROM Branch AS B
+JOIN Ternary AS T ON B.bid = T.bid
+JOIN Customer AS C ON T.cno = C.cno
+JOIN Loan_Application AS L ON T.lno = L.lno
+WHERE EXTRACT(MONTH FROM L.l_date) = 9;
+
+---
+-- Part 2: Create Views (with smaller aliases)
+---
+
+-- a. Display the details of all customers who have received a loan amount less than their requirement.
+CREATE VIEW loan_less_than_required_customers AS
+SELECT
+    C.*
+FROM
+    Customer AS C
+JOIN
+    Ternary AS T ON C.cno = T.cno
+JOIN
+    Loan_Application AS L ON T.lno = L.lno
+WHERE
+    L.lamtapproved < L.lamtrequired;
+
+
+-- b. Display sum of loan amount approved branch wise from 1st June 2019 to 1st June 2020.
+CREATE VIEW branch_wise_approved_loans AS
+SELECT
+    B.brname,
+    SUM(L.lamtapproved) AS total_approved_loan
+FROM
+    Branch AS B
+JOIN
+    Ternary AS T ON B.bid = T.bid
+JOIN
+    Loan_Application AS L ON T.lno = L.lno
+WHERE
+    L.l_date BETWEEN '2019-06-01' AND '2020-06-01'
+GROUP BY
+    B.brname;
+
+-- 2. Count branch wise all customers who required loan amount more than 30 lakhs.
+CREATE VIEW high_requirement_customers AS
+SELECT
+    B.brname,
+    COUNT(C.cno) AS customer_count
+FROM
+    Branch AS B
+JOIN
+    Ternary AS T ON B.bid = T.bid
+JOIN
+    Customer AS C ON T.cno = C.cno
+JOIN
+    Loan_Application AS L ON T.lno = L.lno
+WHERE
+    L.lamtrequired > 3000000.00::money
+GROUP BY
+    B.brname;
+
+-- 3. Display all customer names branch wise who requested a loan amount less than one lakh.
+CREATE VIEW low_loan_request_customers AS
+SELECT
+    B.brname,
+    C.cname
+FROM
+    Branch AS B
+JOIN
+    Ternary AS T ON B.bid = T.bid
+JOIN
+    Customer AS C ON T.cno = C.cno
+JOIN
+    Loan_Application AS L ON T.lno = L.lno
+WHERE
+    L.lamtrequired < 100000.00::money
+ORDER BY
+    B.brname, C.cname;
