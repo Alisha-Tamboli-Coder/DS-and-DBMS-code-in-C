@@ -1,0 +1,92 @@
+Assignment 6 Set A
+Set A
+a) Perform the following operations using static implementation of Queue
+i. Create a queue of n integers.
+ii. Delete the element from the queue and display it.
+#include <stdio.h>
+#define MAX 5
+
+int queue[MAX], front=-1, rear=-1;
+
+void enqueue(int val) {
+    if (rear == MAX-1) printf("Queue Overflow\n");
+    else {
+        if (front == -1) front = 0;
+        queue[++rear] = val;
+    }
+}
+
+void dequeueAll() {
+    if (front == -1) 
+        printf("Queue Empty\n");
+    else {
+        printf("Deleted elements");
+        while(front <= rear) {
+            printf(" %d ", queue[front]);
+            front++;
+        }
+        front = rear = -1; // reset
+    }
+}
+
+int main() {
+    int n, val;
+    printf("Enter number of elements: ");
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+        scanf("%d",&val);
+        enqueue(val);
+    }
+    dequeueAll();
+    return 0;
+}
+
+
+
+b) Perform the following operations using dynamic implementation of Queue
+i. Insert n elements in a queue.
+ii. Delete the element from the queue and display it.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+};
+struct Node *front=NULL, *rear=NULL;
+
+void enqueue(int val) {
+    struct Node* newNode = malloc(sizeof(struct Node));
+    newNode->data = val; newNode->next = NULL;
+    if (rear == NULL) front = rear = newNode;
+    else { rear->next = newNode; rear = newNode; }
+}
+
+void dequeueAll() {
+    struct Node* temp;
+    if(front == NULL) 
+        printf("Queue Empty\n");
+    else {
+        printf("Deleted elements ");
+        while(front != NULL) {
+            temp = front;
+            printf("%d  ", temp->data);
+            front = front->next;
+            free(temp);
+        }
+        rear = NULL;
+    }
+}
+
+int main() {
+    int n, val;
+    printf("Enter number of elements: ");
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+        scanf("%d",&val);
+        enqueue(val);
+    }
+    dequeueAll();
+    return 0;
+}
